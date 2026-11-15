@@ -23,6 +23,7 @@ const isRelevant = (job, profile) => {
     ...profile.targetLocations.map((l) => l.toLowerCase()),
     "remote",
     "india",
+    "bengaluru",
   ];
   if (loc && !wanted.some((w) => loc.includes(w))) return false;
 

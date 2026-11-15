@@ -1,0 +1,55 @@
+Vishal Kumar Gupta
++91-7234961137 | vishalgupta10852@gmail.com | LinkedIn | Github | LeetCode
+
+Professional Summary
+Aspiring Software Engineer with a strong foundation in Java, Object-Oriented Programming (OOP), Data Structures & Algorithms, Database Management Systems (DBMS), and Software Development Lifecycle (SDLC). Hands-on experience in designing, developing, testing, maintaining, and optimizing software applications using Java, JavaScript, Node.js, Express.js, React.js and MongoDB. Passionate about solving software engineering problems through analytical thinking, writing clean and maintainable code, debugging applications, and collaborating effectively in Agile teams to deliver high-quality software solutions.
+
+Technical Skills
+Languages: Java, JavaScript
+Databases: MongoDB, MySQL
+Web Technologies: React.js, Node.js, Express.js, HTML5, CSS3, Tailwind CSS, Mongoose
+Core Concepts: Data Structures & Algorithms (Arrays, Linked List, Stack, Queue), OOPs, DBMS, Operating Systems
+Tools: Git, GitHub, Postman, UiPath Studio
+
+Projects
+Your-Own-AI – Train Your Own RAG-based AI Assistant [GitHub] — Java, Ollama, REST API (Apr 2026)
+• Built a fully local AI assistant using Retrieval-Augmented Generation (RAG) with vector embeddings, letting users train the model on their own data
+• Compared three vector similarity search backends — HNSW, KD-Tree, and Brute Force — benchmarking retrieval speed (600ms vs 2900ms vs 6000ms) for performance tuning.
+• Integrated PDFBox for document ingestion and a custom JSON-based vector store for persistent, scalable semantic search.
+• Structured the codebase with clear module separation to simplify future debugging and feature additions.
+
+Wanderlust – Travel Destination Web Application [GitHub] — EJS, Node.js, Express.js, MongoDB, Cloudinary (Mar 2025)
+• Engineered a travel rental platform supporting listing, booking, and CRUD operations for 100+ destinations.
+• Secured user data with JWT authentication and role-based authorization.
+• Designed 8+ RESTful API endpoints and optimized queries with structured MongoDB schemas.
+• Maintained and documented backend modules for easier troubleshooting.
+
+Social Media Backend – YouTube/Twitter-style Backend [GitHub] — Node.js, Express, MongoDB, Cloudinary (Jun 2026)
+• Architected a scalable REST API backend inspired by YouTube/Twitter, with JWT authentication and refresh-token rotation.
+• Wrote MongoDB aggregation pipelines for user subscriptions, video feeds, and channel statistics with optimized $lookup and $match stages.
+• Implemented video and image upload architecture using Multer for local buffering and Cloudinary for cloud storage/CDN delivery.
+• Structured users, videos, comments, likes, and playlists around an MVC pattern with centralized error handling.
+
+Internship Experience
+BlueStock.in — Remote, Pune
+Software Developer Intern (June – Aug 2025)
+• Developed reusable React.js components with Tailwind CSS for IPO dashboard features.
+• Integrated REST APIs to fetch and display IPO data with accurate frontend-backend communication.
+• Debugged UI and API-related issues using browser developer tools and mock datasets, improving application stability.
+• Documented features and workflows for smooth handover and team collaboration.
+• Delivered production-ready features in Agile environment using Git workflows.
+
+Certifications & Achievements
+Finalist, Tata Imagination Challenge 2025 – among 300,000+ participants nationwide
+Solved 200+ problems on LeetCode, strengthening DSA and problem-solving skills
+Java DSA & Full Stack Development – Apna College (Jan – Aug 2025)
+Automation & RPA Training, 85% score – Infosys Foundation-ICT Academy (Nov 2025)
+
+Education
+Seth Vishambhar Nath Group of Educational Institutions, Barabanki, UP (2022 – 2026)
+Bachelor of Technology – Computer Science (CGPA: 7.5/10)
+LaL B S N I College, Deoria, UP (2020 – 2022)
+Higher Secondary Education (Class XII)
+
+Interests
+LeetCode Problem Solving, Cloud Computing, Chess

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Job from "../models/Job.js";
 import { runDiscovery } from "../services/discovery.service.js";
-import { runScoring } from "../../scoring.service.js";
+import { runScoring } from "../services/scoring.service.js";
 
 const router = Router();
 
@@ -11,15 +11,22 @@ router.post("/discover", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { status } = req.query;
+  const { status, sort } = req.query;
+  const order = sort === "score" ? { matchScore: -1 } : { createdAt: -1 };
   const jobs = await Job.find(status ? { status } : {})
-    .sort({ createdAt: -1 })
+    .sort(order)
     .limit(100);
   res.json(jobs);
 });
+// for ek bar ke liye score karne ke liye (credits aane ke baad kaam aayega)
+// router.post("/score", async (req, res) => {
+//   const summary = await runScoring();
+//   res.json(summary);
+// });
 
 router.post("/score", async (req, res) => {
-  const summary = await runScoring();
+  const limit = Number(req.query.limit) || 20;
+  const summary = await runScoring(limit);
   res.json(summary);
 });
 

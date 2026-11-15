@@ -18,7 +18,7 @@ const profileSchema = z.object({
   experienceYears: z.number().min(0).default(0),
   expectedCTC: z.string().optional(),
   noticePeriod: z.string().optional(),
-  resumeText: z.string().default(""),
+  resumeText: z.string().optional(),
   blockedCompanies: z.array(z.string()).default([]),
 });
 

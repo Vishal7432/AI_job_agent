@@ -8,18 +8,25 @@ const resumeText = fs.readFileSync(
   "utf8",
 );
 
+if (resumeText.trim().length < 100) {
+  console.log(
+    " resume.txt khali hai ya bahut chhoti hai. Pehle usme resume paste karke save karo (Ctrl+S).",
+  );
+  process.exit(1);
+}
+
 await mongoose.connect(process.env.MONGO_URI);
 
 const profile = await Profile.findOneAndUpdate(
   {},
   { $set: { resumeText } },
-  { new: true },
+  { returnDocument: "after" },
 );
 
 if (!profile) {
   console.log("Pehle PUT /api/profile se basic profile save karo");
 } else {
-  console.log(`Resume saved (${resumeText.length} characters)`);
+  console.log(`Resume saved  (${resumeText.length} characters)`);
 }
 
 await mongoose.disconnect();

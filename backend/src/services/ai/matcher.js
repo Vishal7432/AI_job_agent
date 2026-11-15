@@ -63,17 +63,19 @@ export function localScore(profile, job) {
   )
     score += 15;
 
-  // "3+ years" jaisi cheez mile to fresher ke liye score gira do
-  const years = [...jd.matchAll(/(\d+)\+?\s*(?:years|yrs)/g)].map((m) =>
-    Number(m[1]),
-  );
-  const maxYears = years.length ? Math.max(...years) : 0;
-  if (maxYears >= 2) score = Math.min(score, 35);
+  // Sirf "N years of experience" jaise phrases dekho (company-age jaisi cheezein ignore)
+  const expMatches = [
+    ...jd.matchAll(
+      /(\d+)\s*(?:\+|-\s*\d+|to\s*\d+)?\s*(?:years|yrs)\s*(?:of\s*)?(?:relevant\s*|professional\s*|industry\s*|hands-on\s*|software\s*|work\s*)?(?:experience|exp)/g,
+    ),
+  ].map((m) => Number(m[1]));
+  const minYears = expMatches.length ? Math.min(...expMatches) : 0;
+  if (minYears >= 2) score = Math.min(score, 35);
 
   score = Math.min(score, 100);
   return {
     score,
-    reason: `Matched: ${matched.join(", ") || "none"}${maxYears ? ` | Experience mentioned: ${maxYears}+ yrs` : ""}`,
+    reason: `Matched: ${matched.join(", ") || "none"}${minYears ? ` | Experience required: ${minYears}+ yrs` : ""}`,
     missingSkills: missing,
   };
 }

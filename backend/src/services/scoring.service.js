@@ -1,6 +1,6 @@
-import Job from "./src/models/Job.js";
-import Profile from "./src/models/Profile.js";
-import { scoreJob } from "./src/services/ai/matcher.js";
+import Job from "../models/Job.js";
+import Profile from "../models/Profile.js";
+import { scoreJob } from "./ai/matcher.js";
 
 export async function runScoring(limit = 20) {
   const profile = await Profile.findOne();
