@@ -23,4 +23,13 @@ router.post("/score", async (req, res) => {
   res.json(summary);
 });
 
+// Claude se dobara score karwane ke liye (credits aane ke baad kaam aayega)
+router.post("/reset-scores", async (req, res) => {
+  const r = await Job.updateMany(
+    { status: { $in: ["scored", "skipped"] } },
+    { $set: { status: "new", matchScore: null, matchReason: "" } },
+  );
+  res.json({ reset: r.modifiedCount });
+});
+
 export default router;
