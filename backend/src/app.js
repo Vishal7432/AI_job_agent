@@ -4,6 +4,7 @@ import cors from "cors";
 import { connectDB } from "./config/db.js";
 import profileRoutes from "./routes/profile.routes.js";
 import jobRoutes from "./routes/job.routes.js";
+import applicationRoutes from "./routes/application.routes.js";
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,8 @@ app.get("/health", (_, res) => res.json({ ok: true }));
 
 app.use("/api/profile", profileRoutes);
 app.use("/api/jobs", jobRoutes);
+
+app.use("/api/applications", applicationRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);
