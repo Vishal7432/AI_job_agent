@@ -1,122 +1,173 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import { api, post, patch } from "./api/client";
+import JobCard from "./components/JobCard";
 
-function App() {
-  const [count, setCount] = useState(0)
+const QUEUE_FILTERS = ["pending_approval", "approved", "applied", "rejected"];
+
+export default function App() {
+  const [tab, setTab] = useState("jobs");
+  const [queueFilter, setQueueFilter] = useState("pending_approval");
+  const [jobs, setJobs] = useState([]);
+  const [apps, setApps] = useState([]);
+  const [msg, setMsg] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  const refresh = async () => {
+    try {
+      if (tab === "jobs") setJobs(await api("/jobs?status=scored&sort=score"));
+      else setApps(await api(`/applications?status=${queueFilter}`));
+    } catch (e) {
+      setMsg({ type: "error", text: e.message });
+    }
+  };
+
+  useEffect(() => {
+    refresh();
+  }, [tab, queueFilter]);
+
+  // Har button ka kaam yahin se chalta hai (loading + message ek jagah)
+  const run = async (label, fn) => {
+    setBusy(true);
+    setMsg({ type: "info", text: `${label}... thoda wait karo` });
+    try {
+      const result = await fn();
+      setMsg({ type: "info", text: `${label}: ${JSON.stringify(result)}` });
+      await refresh();
+    } catch (e) {
+      setMsg({ type: "error", text: `${label} fail: ${e.message}` });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
+    <div className="app">
+      <h1>AI Job Agent</h1>
+      <p className="sub">
+        Discover → Score → Approve → Apply (final submit tum khud karoge)
+      </p>
+
+      <div className="toolbar">
         <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          disabled={busy}
+          onClick={() => run("Discover", () => post("/jobs/discover"))}
         >
-          Count is {count}
+          1. Discover jobs
         </button>
-      </section>
+        <button
+          disabled={busy}
+          onClick={() => run("Score", () => post("/jobs/score?limit=300"))}
+        >
+          2. Score jobs
+        </button>
+        <button
+          className="primary"
+          disabled={busy}
+          onClick={() => run("Queue", () => post("/applications/queue"))}
+        >
+          3. Scored jobs ko queue mein daalo
+        </button>
+      </div>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      {msg && (
+        <div className={`msg ${msg.type === "error" ? "error" : ""}`}>
+          {msg.text}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <div className="tabs">
+        <button
+          className={tab === "jobs" ? "active" : ""}
+          onClick={() => setTab("jobs")}
+        >
+          Scored jobs
+        </button>
+        <button
+          className={tab === "queue" ? "active" : ""}
+          onClick={() => setTab("queue")}
+        >
+          Approval queue
+        </button>
+      </div>
+
+      {tab === "jobs" && (
+        <>
+          {jobs.length === 0 && (
+            <p className="sub">
+              Abhi koi scored job nahi. Upar se Discover aur Score chalao.
+            </p>
+          )}
+          {jobs.map((j) => (
+            <JobCard key={j._id} job={j} />
+          ))}
+        </>
+      )}
+
+      {tab === "queue" && (
+        <>
+          <div className="tabs">
+            {QUEUE_FILTERS.map((s) => (
+              <button
+                key={s}
+                className={queueFilter === s ? "active" : ""}
+                onClick={() => setQueueFilter(s)}
+              >
+                {s.replace("_", " ")}
+              </button>
+            ))}
+          </div>
+
+          {apps.length === 0 && (
+            <p className="sub">Is status mein koi application nahi.</p>
+          )}
+
+          {apps.map((a) => (
+            <JobCard key={a._id} job={a.job}>
+              {a.status === "pending_approval" && (
+                <>
+                  <button
+                    className="good"
+                    disabled={busy}
+                    onClick={() =>
+                      run("Approve", () =>
+                        patch(`/applications/${a._id}/approve`),
+                      )
+                    }
+                  >
+                    Approve
+                  </button>
+                  <button
+                    className="bad"
+                    disabled={busy}
+                    onClick={() =>
+                      run("Reject", () =>
+                        patch(`/applications/${a._id}/reject`),
+                      )
+                    }
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+              {a.status === "approved" && (
+                <button
+                  className="primary"
+                  disabled={busy}
+                  onClick={() =>
+                    run("Mark applied", () =>
+                      patch(`/applications/${a._id}/applied`),
+                    )
+                  }
+                >
+                  Maine apply kar diya
+                </button>
+              )}
+              <span className="badge">{a.status}</span>
+            </JobCard>
+          ))}
+        </>
+      )}
+    </div>
+  );
 }
-
-export default App
