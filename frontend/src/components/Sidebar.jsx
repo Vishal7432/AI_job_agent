@@ -7,6 +7,7 @@ import {
   BarChart3,
   Settings,
   SlidersHorizontal,
+  Rocket,
 } from "lucide-react";
 import { api } from "../api/client";
 
@@ -53,6 +54,14 @@ export default function Sidebar({ page, setPage }) {
           </button>
         ))}
       </nav>
+
+      <div className="promo">
+        <Rocket size={26} />
+        <p>Let AI find better opportunities for you</p>
+        <button className="btn-primary" onClick={() => setPage("automation")}>
+          Run automation
+        </button>
+      </div>
 
       <div className="user">
         <div className="avatar">{(name || "U").slice(0, 1).toUpperCase()}</div>

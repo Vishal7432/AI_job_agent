@@ -9,6 +9,8 @@ import {
 import { api } from "../api/client";
 import StatCard from "../components/StatCard";
 import Donut from "../components/Donut";
+import { Star } from "lucide-react";
+import Robot from "../components/Robot";
 
 const LABEL = {
   applied: "Applied",
@@ -54,13 +56,19 @@ export default function Dashboard({ go }) {
   return (
     <>
       <section className="hero">
-        <h1>Your AI Job Agent is working for you</h1>
-        <p>
-          {heroText} Final apply tum khud karoge, taaki accounts safe rahein.
-        </p>
-        <button className="btn-primary" onClick={() => go("jobs")}>
-          Open approval queue <ArrowRight size={16} />
-        </button>
+        <div className="hero-text">
+          <h1>Your AI Job Agent is working for you!</h1>
+          <p>
+            {heroText} Final apply tum khud karoge, taaki accounts safe rahein.
+          </p>
+          <button className="btn-primary" onClick={() => go("jobs")}>
+            View approval queue <ArrowRight size={16} />
+          </button>
+        </div>
+        <div className="hero-art">
+          <span className="tag">Get Hired Faster!</span>
+          <Robot />
+        </div>
       </section>
 
       <section className="stats">
@@ -96,19 +104,30 @@ export default function Dashboard({ go }) {
           {recent.length === 0 && (
             <p className="muted">Abhi koi activity nahi.</p>
           )}
-          {recent.map((a) => (
-            <div className="activity" key={a._id}>
-              <div>
-                <div className="activity-title">{a.job?.title}</div>
-                <div className="muted small">
-                  {a.job?.company} · {timeAgo(a.updatedAt)}
+          {recent.map((a) => {
+            const Icon =
+              a.status === "rejected"
+                ? XCircle
+                : a.status === "approved"
+                  ? Star
+                  : CheckCircle2;
+            return (
+              <div className="activity" key={a._id}>
+                <div className={`act-icon ${a.status}`}>
+                  <Icon size={18} />
                 </div>
+                <div className="act-body">
+                  <div className="activity-title">{a.job?.title}</div>
+                  <div className="muted small">
+                    {a.job?.company} · {timeAgo(a.updatedAt)}
+                  </div>
+                </div>
+                <span className={`pill ${a.status}`}>
+                  {LABEL[a.status] || a.status}
+                </span>
               </div>
-              <span className={`pill ${a.status}`}>
-                {LABEL[a.status] || a.status}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="panel">
