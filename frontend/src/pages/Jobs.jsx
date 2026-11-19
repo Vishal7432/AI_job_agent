@@ -5,8 +5,8 @@ import { useAction } from "../hooks/useAction";
 
 const QUEUE_FILTERS = ["pending_approval", "approved", "applied", "rejected"];
 
-export default function Jobs() {
-  const [tab, setTab] = useState("queue");
+export default function Jobs({ query = "" }) {
+  const [tab, setTab] = useState(() => (query.trim() ? "jobs" : "queue"));
   const [queueFilter, setQueueFilter] = useState("pending_approval");
   const [jobs, setJobs] = useState([]);
   const [apps, setApps] = useState([]);
@@ -23,6 +23,16 @@ export default function Jobs() {
   };
 
   const { msg, busy, run } = useAction(refresh);
+  const search = query.trim().toLowerCase();
+  const matchesSearch = (job) =>
+    !search ||
+    [job?.title, job?.company, job?.location].some((value) =>
+      value?.toLowerCase().includes(search),
+    );
+  const visibleJobs = jobs.filter(matchesSearch);
+  const visibleApps = apps.filter((application) =>
+    matchesSearch(application.job),
+  );
 
   useEffect(() => {
     refresh();
@@ -55,10 +65,14 @@ export default function Jobs() {
 
       {tab === "jobs" && (
         <>
-          {jobs.length === 0 && (
-            <p className="muted">Abhi koi scored job nahi.</p>
+          {visibleJobs.length === 0 && (
+            <p className="muted">
+              {search
+                ? "No scored jobs match your search."
+                : "Abhi koi scored job nahi."}
+            </p>
           )}
-          {jobs.map((j) => (
+          {visibleJobs.map((j) => (
             <JobCard key={j._id} job={j} />
           ))}
         </>
@@ -78,11 +92,15 @@ export default function Jobs() {
             ))}
           </div>
 
-          {apps.length === 0 && (
-            <p className="muted">Is status mein koi application nahi.</p>
+          {visibleApps.length === 0 && (
+            <p className="muted">
+              {search
+                ? "No applications match your search."
+                : "Is status mein koi application nahi."}
+            </p>
           )}
 
-          {apps.map((a) => (
+          {visibleApps.map((a) => (
             <JobCard key={a._id} job={a.job}>
               {a.status === "pending_approval" && (
                 <>

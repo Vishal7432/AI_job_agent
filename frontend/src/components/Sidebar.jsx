@@ -8,6 +8,7 @@ import {
   Settings,
   SlidersHorizontal,
   Rocket,
+  X,
 } from "lucide-react";
 import { api } from "../api/client";
 
@@ -21,7 +22,7 @@ const ITEMS = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
-export default function Sidebar({ page, setPage }) {
+export default function Sidebar({ page, setPage, open, onClose }) {
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Sidebar({ page, setPage }) {
   }, []);
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${open ? "open" : ""}`}>
       <div className="brand">
         <div className="brand-icon">
           <Briefcase size={20} />
@@ -40,6 +41,13 @@ export default function Sidebar({ page, setPage }) {
           <div className="brand-name">AI Job Agent</div>
           <div className="brand-sub">Apply · Track · Grow</div>
         </div>
+        <button
+          className="sidebar-close"
+          onClick={onClose}
+          aria-label="Close navigation menu"
+        >
+          <X size={20} />
+        </button>
       </div>
 
       <nav>
@@ -47,7 +55,10 @@ export default function Sidebar({ page, setPage }) {
           <button
             key={id}
             className={`nav-item ${page === id ? "active" : ""}`}
-            onClick={() => setPage(id)}
+            onClick={() => {
+              setPage(id);
+              onClose();
+            }}
           >
             <Icon size={18} />
             {label}
@@ -58,7 +69,13 @@ export default function Sidebar({ page, setPage }) {
       <div className="promo">
         <Rocket size={26} />
         <p>Let AI find better opportunities for you</p>
-        <button className="btn-primary" onClick={() => setPage("automation")}>
+        <button
+          className="btn-primary"
+          onClick={() => {
+            setPage("automation");
+            onClose();
+          }}
+        >
           Run automation
         </button>
       </div>

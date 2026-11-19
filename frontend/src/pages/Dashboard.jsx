@@ -18,6 +18,8 @@ const LABEL = {
   rejected: "Rejected",
 };
 
+const fetchStats = () => api("/stats");
+
 function timeAgo(date) {
   const mins = Math.round((Date.now() - new Date(date)) / 60000);
   if (mins < 60) return `${Math.max(mins, 1)} min ago`;
@@ -29,16 +31,48 @@ function timeAgo(date) {
 export default function Dashboard({ go }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const retryStats = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setData(await fetchStats());
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    api("/stats")
-      .then(setData)
-      .catch((e) => setError(e.message));
+    let active = true;
+    fetchStats()
+      .then((result) => {
+        if (active) setData(result);
+      })
+      .catch((e) => {
+        if (active) setError(e.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   if (error)
-    return <div className="msg error">Stats load nahi hue: {error}</div>;
-  if (!data) return <p className="muted">Loading...</p>;
+    return (
+      <div className="msg error" role="alert">
+        <p>Stats load nahi hue: {error}</p>
+        <button onClick={retryStats} disabled={loading}>
+          Retry
+        </button>
+      </div>
+    );
+  if (loading || !data) return <p className="muted">Loading...</p>;
 
   const { counts, scoredJobs, recent, topMatches } = data;
   const decided = counts.approved + counts.applied + counts.rejected;

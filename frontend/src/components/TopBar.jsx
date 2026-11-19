@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Bell, Sun, Moon } from "lucide-react";
+import { Search, Bell, Sun, Moon, Menu } from "lucide-react";
 import { api } from "../api/client";
 
 export default function TopBar({
@@ -9,6 +9,8 @@ export default function TopBar({
   theme,
   toggleTheme,
   onBell,
+  onMenu,
+  menuOpen,
 }) {
   const [pending, setPending] = useState(0);
 
@@ -24,6 +26,14 @@ export default function TopBar({
 
   return (
     <header className="topbar">
+      <button
+        className="icon-btn mobile-menu-btn"
+        onClick={onMenu}
+        aria-label="Open navigation menu"
+        aria-expanded={menuOpen}
+      >
+        <Menu size={20} />
+      </button>
       <div className="search">
         <Search size={18} />
         <input

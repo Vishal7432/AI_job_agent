@@ -160,6 +160,10 @@ button.bad {
   justify-content: center;
   border-radius: 12px;
 }
+.mobile-menu-btn,
+.sidebar-close {
+  display: none;
+}
 .dot {
   position: absolute;
   top: 9px;
@@ -183,6 +187,9 @@ button.bad {
   position: sticky;
   top: 0;
   height: 100vh;
+}
+.mobile-backdrop {
+  display: none;
 }
 .brand {
   display: flex;
@@ -562,6 +569,110 @@ nav {
   flex-wrap: wrap;
   margin: 14px 0;
 }
+.automation {
+  max-width: 860px;
+}
+.automation-intro {
+  margin: 6px 0 16px;
+  color: var(--muted);
+}
+.automation-safety {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  background: var(--primary-soft);
+  line-height: 1.5;
+}
+.automation-steps {
+  display: grid;
+  gap: 12px;
+}
+.automation-step {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.automation-step-heading {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+}
+.automation-step-number {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+}
+.automation-step-copy h2 {
+  margin: 0 0 4px;
+}
+.automation-step-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.automation-status {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.automation-status.running {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+.automation-status.completed {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.automation-status.warning {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.automation-status.failed {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.automation-step > button {
+  justify-self: start;
+}
+.automation-result {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.automation-result.error {
+  color: var(--bad);
+  background: var(--bad-soft);
+}
+.automation-warnings {
+  color: var(--warn);
+  font-size: 14px;
+}
+.automation-warnings summary {
+  cursor: pointer;
+}
+.automation-warnings ul {
+  margin: 8px 0 0;
+  padding-left: 22px;
+  color: var(--muted);
+}
 .msg {
   padding: 10px 14px;
   border-radius: 10px;
@@ -624,21 +735,95 @@ nav {
 
 @media (max-width: 800px) {
   .shell {
-    flex-direction: column;
+    flex-direction: row;
   }
   .sidebar {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    width: min(82vw, 300px);
+    height: 100dvh;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .sidebar-close {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin-left: auto;
+    justify-content: center;
+    color: var(--sidebar-text);
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .mobile-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 19;
+    inset: 0;
     width: 100%;
-    height: auto;
-    position: static;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: rgba(9, 8, 24, 0.58);
+  }
+  .mobile-menu-btn {
+    display: inline-flex;
+    flex-shrink: 0;
   }
   nav {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
   }
   .main {
+    width: 100%;
     padding: 18px 16px 48px;
+  }
+  .topbar {
+    gap: 8px;
+  }
+  .search {
+    min-width: 0;
+    padding: 0 10px;
+  }
+  .search input {
+    min-width: 0;
+  }
+  .top-actions {
+    gap: 6px;
   }
   .hero-art {
     display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .automation-step-heading {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+  .automation-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .automation-step > button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
   }
 }

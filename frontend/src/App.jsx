@@ -11,6 +11,7 @@ const PAGES = { dashboard: Dashboard, jobs: Jobs, automation: Automation };
 export default function App() {
   const [page, setPage] = useState("dashboard");
   const [query, setQuery] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "light",
   );
@@ -20,17 +21,47 @@ export default function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [mobileMenuOpen]);
+
   const Page = PAGES[page];
 
   return (
     <div className="shell">
-      <Sidebar page={page} setPage={setPage} />
+      <Sidebar
+        page={page}
+        setPage={setPage}
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
+      {mobileMenuOpen && (
+        <button
+          className="mobile-backdrop"
+          aria-label="Close navigation menu"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
       <main className="main">
         <TopBar
           query={query}
           setQuery={setQuery}
           onSearch={() => setPage("jobs")}
           onBell={() => setPage("jobs")}
+          onMenu={() => setMobileMenuOpen(true)}
+          menuOpen={mobileMenuOpen}
           theme={theme}
           toggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
         />
