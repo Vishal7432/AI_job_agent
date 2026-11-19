@@ -295,6 +295,17 @@ nav {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.28);
 }
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+}
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.2;
+}
 .hero-text {
   position: relative;
   z-index: 1;
