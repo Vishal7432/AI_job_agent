@@ -5,8 +5,8 @@ import { useAction } from "../hooks/useAction";
 
 const QUEUE_FILTERS = ["pending_approval", "approved", "applied", "rejected"];
 
-export default function Jobs({ query = "" }) {
-  const [tab, setTab] = useState(() => (query.trim() ? "jobs" : "queue"));
+export default function Jobs({ query = "", initialTab = "queue" }) {
+  const [tab, setTab] = useState(() => (query.trim() ? "jobs" : initialTab));
   const [queueFilter, setQueueFilter] = useState("pending_approval");
   const [jobs, setJobs] = useState([]);
   const [apps, setApps] = useState([]);

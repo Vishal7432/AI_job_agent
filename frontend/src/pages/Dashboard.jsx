@@ -18,7 +18,31 @@ const LABEL = {
   rejected: "Rejected",
 };
 
-const fetchStats = () => api("/stats");
+const fetchStats = (period = "all") =>
+  api(`/stats?period=${encodeURIComponent(period)}`);
+
+function CompanyLogo({ company }) {
+  const domain = company?.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const [showImage, setShowImage] = useState(Boolean(domain));
+
+  return (
+    <span className="match-logo">
+      {!showImage && (
+        <span className="match-logo-fallback" aria-hidden="true">
+          {company?.trim().charAt(0).toUpperCase() || "?"}
+        </span>
+      )}
+      {showImage && (
+        <img
+          src={`https://www.google.com/s2/favicons?domain=${domain}.com&sz=64`}
+          alt=""
+          aria-hidden="true"
+          onError={() => setShowImage(false)}
+        />
+      )}
+    </span>
+  );
+}
 
 function timeAgo(date) {
   const mins = Math.round((Date.now() - new Date(date)) / 60000);
@@ -29,6 +53,7 @@ function timeAgo(date) {
 }
 
 export default function Dashboard({ go }) {
+  const [period, setPeriod] = useState("30d");
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,7 +62,7 @@ export default function Dashboard({ go }) {
     setLoading(true);
     setError(null);
     try {
-      setData(await fetchStats());
+      setData(await fetchStats(period));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -47,7 +72,7 @@ export default function Dashboard({ go }) {
 
   useEffect(() => {
     let active = true;
-    fetchStats()
+    fetchStats(period)
       .then((result) => {
         if (active) setData(result);
       })
@@ -61,7 +86,7 @@ export default function Dashboard({ go }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [period]);
 
   if (error)
     return (
@@ -165,7 +190,25 @@ export default function Dashboard({ go }) {
         </div>
 
         <div className="panel">
-          <h2>Application summary</h2>
+          <div className="panel-heading">
+            <h2>Application summary</h2>
+            <label className="period-control">
+              <span className="sr-only">Application summary time period</span>
+              <select
+                value={period}
+                onChange={(event) => {
+                  setLoading(true);
+                  setError(null);
+                  setPeriod(event.target.value);
+                }}
+              >
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="90d">Last 90 days</option>
+                <option value="all">All time</option>
+              </select>
+            </label>
+          </div>
           <div className="summary">
             <Donut
               label={`${rate}%`}
@@ -195,7 +238,16 @@ export default function Dashboard({ go }) {
       </section>
 
       <section className="panel">
-        <h2>Top job matches</h2>
+        <div className="panel-heading matches-panel-heading">
+          <h2>Top job matches</h2>
+          <button
+            className="view-more"
+            onClick={() => go("jobs", "jobs")}
+            aria-label="View more scored job matches"
+          >
+            View more <ArrowRight size={15} />
+          </button>
+        </div>
         {topMatches.length === 0 && (
           <p className="muted">Pehle jobs score karo.</p>
         )}
@@ -208,9 +260,14 @@ export default function Dashboard({ go }) {
               target="_blank"
               rel="noreferrer"
             >
-              <div className="match-title">{j.title}</div>
-              <div className="muted small">
-                {j.company} · {j.location || "n/a"}
+              <div className="match-heading">
+                <CompanyLogo company={j.company} />
+                <div className="match-copy">
+                  <div className="match-title">{j.title}</div>
+                  <div className="muted small">
+                    {j.company} · {j.location || "n/a"}
+                  </div>
+                </div>
               </div>
               <span className="pill applied">{j.matchScore}% match</span>
             </a>

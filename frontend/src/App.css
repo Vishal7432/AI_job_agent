@@ -416,6 +416,68 @@ nav {
   margin-bottom: 18px;
   box-shadow: var(--shadow);
 }
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.panel-heading h2 {
+  margin: 0;
+}
+.matches-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.view-more {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+.matches-panel-heading .view-more {
+  margin-left: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--primary);
+}
+.view-more:hover:not(:disabled) {
+  transform: none;
+  text-decoration: underline;
+}
+.matches-panel-heading .view-more:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+.period-control select {
+  max-width: 150px;
+  padding: 8px 28px 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .grid-2 .panel {
   margin-bottom: 0;
 }
@@ -544,6 +606,41 @@ nav {
 .match-title {
   font-weight: 600;
   margin-bottom: 2px;
+}
+.match-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.match-copy {
+  min-width: 0;
+}
+.match-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+}
+.match-logo img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.match-logo-fallback {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
 }
 .match .pill {
   display: inline-block;

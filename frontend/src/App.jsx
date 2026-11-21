@@ -10,6 +10,7 @@ const PAGES = { dashboard: Dashboard, jobs: Jobs, automation: Automation };
 
 export default function App() {
   const [page, setPage] = useState("dashboard");
+  const [jobsInitialTab, setJobsInitialTab] = useState("queue");
   const [query, setQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(
@@ -38,6 +39,10 @@ export default function App() {
   }, [mobileMenuOpen]);
 
   const Page = PAGES[page];
+  const go = (nextPage, jobsTab = "queue") => {
+    if (nextPage === "jobs") setJobsInitialTab(jobsTab);
+    setPage(nextPage);
+  };
 
   return (
     <div className="shell">
@@ -58,15 +63,15 @@ export default function App() {
         <TopBar
           query={query}
           setQuery={setQuery}
-          onSearch={() => setPage("jobs")}
-          onBell={() => setPage("jobs")}
+          onSearch={() => go("jobs", query.trim() ? "jobs" : "queue")}
+          onBell={() => go("jobs")}
           onMenu={() => setMobileMenuOpen(true)}
           menuOpen={mobileMenuOpen}
           theme={theme}
           toggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
         />
         {Page ? (
-          <Page go={setPage} query={query} />
+          <Page go={go} query={query} initialTab={jobsInitialTab} />
         ) : (
           <>
             <h1 className="page-title">Coming soon</h1>
