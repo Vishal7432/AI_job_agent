@@ -5,6 +5,7 @@ import TopBar from "./components/Topbar";
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
 import Automation from "./pages/Automation";
+import ResumeLab from "./pages/ResumeLab";
 
 const PAGES = { dashboard: Dashboard, jobs: Jobs, automation: Automation };
 
@@ -16,6 +17,12 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => localStorage.getItem("theme") || "light",
   );
+  const PAGES = {
+    dashboard: Dashboard,
+    jobs: Jobs,
+    automation: Automation,
+    resume: ResumeLab,
+  };
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;

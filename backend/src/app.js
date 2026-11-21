@@ -6,6 +6,7 @@ import profileRoutes from "./routes/profile.routes.js";
 import jobRoutes from "./routes/job.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import statsRoutes from "./routes/stats.routes.js";
+import resumeRoutes from "./routes/resume.routes.js";
 
 const app = express();
 app.use(cors());
@@ -16,6 +17,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/resume", resumeRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.statusCode || err.status || 500;

@@ -9,6 +9,7 @@ import {
   SlidersHorizontal,
   Rocket,
   X,
+  FileText,
 } from "lucide-react";
 import { api } from "../api/client";
 
@@ -20,6 +21,7 @@ const ITEMS = [
   { id: "profile", label: "Skills and profile", icon: Star },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
+  { id: "resume", label: "Resume lab", icon: FileText },
 ];
 
 export default function Sidebar({ page, setPage, open, onClose }) {

@@ -981,3 +981,84 @@ nav {
     transition: none;
   }
 }
+
+/* Resume lab */
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin: 14px 0;
+}
+textarea,
+select {
+  width: 100%;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+  font-size: 13px;
+}
+textarea {
+  min-height: 260px;
+  resize: vertical;
+  margin-top: 8px;
+}
+select {
+  margin-bottom: 4px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  font-size: 12px;
+  padding: 4px 11px;
+  border-radius: 999px;
+}
+.chip.good {
+  background: var(--good-soft);
+  color: var(--good);
+}
+.chip.bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.tiplist {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+.checks li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+}
+.checks li.ok {
+  color: var(--good);
+}
+.checks li.no {
+  color: var(--bad);
+}
+.small-val {
+  font-size: 20px;
+}
+.verdict.good .stat-value {
+  color: var(--good);
+}
+.verdict.warn .stat-value {
+  color: var(--warn);
+}
+.verdict.bad .stat-value {
+  color: var(--bad);
+}

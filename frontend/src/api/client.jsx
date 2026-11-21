@@ -7,5 +7,12 @@ export async function api(path, options = {}) {
   return data;
 }
 
+export const postJson = (path, body) =>
+  api(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
 export const post = (path) => api(path, { method: "POST" });
 export const patch = (path) => api(path, { method: "PATCH" });
