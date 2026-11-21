@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { api } from "../api/client";
 import StatCard from "../components/StatCard";
-import Donut from "../components/Donut";
+import ApplicationSummary from "../components/ApplicationSummary";
 import { Star } from "lucide-react";
 import Robot from "../components/Robot";
 
@@ -53,7 +53,6 @@ function timeAgo(date) {
 }
 
 export default function Dashboard({ go }) {
-  const [period, setPeriod] = useState("30d");
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +61,7 @@ export default function Dashboard({ go }) {
     setLoading(true);
     setError(null);
     try {
-      setData(await fetchStats(period));
+      setData(await fetchStats("30d"));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -72,7 +71,7 @@ export default function Dashboard({ go }) {
 
   useEffect(() => {
     let active = true;
-    fetchStats(period)
+    fetchStats("30d")
       .then((result) => {
         if (active) setData(result);
       })
@@ -86,7 +85,7 @@ export default function Dashboard({ go }) {
     return () => {
       active = false;
     };
-  }, [period]);
+  }, []);
 
   if (error)
     return (
@@ -100,10 +99,6 @@ export default function Dashboard({ go }) {
   if (loading || !data) return <p className="muted">Loading...</p>;
 
   const { counts, scoredJobs, recent, topMatches } = data;
-  const decided = counts.approved + counts.applied + counts.rejected;
-  const rate = decided
-    ? Math.round(((counts.approved + counts.applied) / decided) * 100)
-    : 0;
 
   let heroText =
     "Abhi koi job queue mein nahi hai. Automation page se Discover aur Score chalao.";
@@ -189,52 +184,7 @@ export default function Dashboard({ go }) {
           })}
         </div>
 
-        <div className="panel">
-          <div className="panel-heading">
-            <h2>Application summary</h2>
-            <label className="period-control">
-              <span className="sr-only">Application summary time period</span>
-              <select
-                value={period}
-                onChange={(event) => {
-                  setLoading(true);
-                  setError(null);
-                  setPeriod(event.target.value);
-                }}
-              >
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-                <option value="90d">Last 90 days</option>
-                <option value="all">All time</option>
-              </select>
-            </label>
-          </div>
-          <div className="summary">
-            <Donut
-              label={`${rate}%`}
-              sub="Approval rate"
-              segments={[
-                { label: "Applied", value: counts.applied, color: "#5b3fd9" },
-                { label: "Approved", value: counts.approved, color: "#22c55e" },
-                { label: "Rejected", value: counts.rejected, color: "#ef4444" },
-              ]}
-            />
-            <ul className="legend">
-              <li>
-                <i style={{ background: "#5b3fd9" }} />
-                Applied <b>{counts.applied}</b>
-              </li>
-              <li>
-                <i style={{ background: "#22c55e" }} />
-                Approved <b>{counts.approved}</b>
-              </li>
-              <li>
-                <i style={{ background: "#ef4444" }} />
-                Rejected <b>{counts.rejected}</b>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <ApplicationSummary initialSummary={data} />
       </section>
 
       <section className="panel">

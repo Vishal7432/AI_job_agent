@@ -582,6 +582,63 @@ nav {
 .legend b {
   margin-left: auto;
 }
+.progress-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  border-radius: 12px;
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--primary) 12%, var(--card)),
+    color-mix(in srgb, var(--primary) 5%, var(--card))
+  );
+}
+.progress-trophy,
+.progress-trend {
+  display: grid;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--primary);
+  background: var(--card);
+}
+.progress-trophy {
+  color: #d97706;
+  background: color-mix(in srgb, #fbbf24 22%, var(--card));
+}
+.progress-copy {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+  font-size: 11px;
+}
+.progress-copy strong {
+  font-size: 12px;
+}
+.progress-copy span {
+  color: var(--muted);
+}
+.progress-trend {
+  margin-left: auto;
+}
+.summary-status {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.progress-card .msg {
+  margin: 0;
+}
+.progress-card .progress-trophy,
+.progress-card .progress-trend {
+  flex-shrink: 0;
+}
 
 .matches {
   display: grid;
