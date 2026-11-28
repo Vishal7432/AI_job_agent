@@ -20,8 +20,8 @@ const ITEMS = [
   { id: "settings-jobs", label: "Job settings", icon: SlidersHorizontal },
   { id: "profile", label: "Skills and profile", icon: Star },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "settings", label: "Settings", icon: Settings },
   { id: "resume", label: "Resume lab", icon: FileText },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
 export default function Sidebar({ page, setPage, open, onClose }) {

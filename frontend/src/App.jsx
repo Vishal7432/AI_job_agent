@@ -66,7 +66,7 @@ export default function App() {
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
-      <main className="main">
+      <main className={`main ${page === "jobs" ? "jobs-page-shell" : ""}`}>
         <TopBar
           query={query}
           setQuery={setQuery}

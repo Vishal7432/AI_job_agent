@@ -1,26 +1,77 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  CheckCircle2,
+  Clock3,
+  Rocket,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { api, patch } from "../api/client";
 import JobCard from "../components/JobCard";
 import { useAction } from "../hooks/useAction";
 
-const QUEUE_FILTERS = ["pending_approval", "approved", "applied", "rejected"];
+const TABS = [
+  { id: "queue", label: "Approval queue" },
+  { id: "jobs", label: "Scored jobs" },
+  { id: "pending_approval", label: "Pending approval" },
+  { id: "approved", label: "Approved" },
+  { id: "applied", label: "Applied" },
+  { id: "rejected", label: "Rejected" },
+];
+
+async function loadJobsData(tab) {
+  const [stats, scoredJobs] = await Promise.all([
+    api("/stats"),
+    api("/jobs?status=scored&sort=score"),
+  ]);
+  const applications =
+    tab === "jobs"
+      ? null
+      : await api(`/applications${tab === "queue" ? "" : `?status=${tab}`}`);
+
+  return { stats, scoredJobs, applications };
+}
+
+function getCounts(stats, scoredJobs) {
+  return {
+    scored: scoredJobs.length,
+    pending_approval: stats.counts.pending,
+    approved: stats.counts.approved,
+    applied: stats.counts.applied,
+    rejected: stats.counts.rejected,
+  };
+}
 
 export default function Jobs({ query = "", initialTab = "queue" }) {
   const [tab, setTab] = useState(() => (query.trim() ? "jobs" : initialTab));
-  const [queueFilter, setQueueFilter] = useState("pending_approval");
   const [jobs, setJobs] = useState([]);
   const [apps, setApps] = useState([]);
   const [loadError, setLoadError] = useState(null);
+  const [counts, setCounts] = useState({
+    scored: 0,
+    pending_approval: 0,
+    approved: 0,
+    applied: 0,
+    rejected: 0,
+  });
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     try {
+      const { stats, scoredJobs, applications } = await loadJobsData(tab);
       setLoadError(null);
-      if (tab === "jobs") setJobs(await api("/jobs?status=scored&sort=score"));
-      else setApps(await api(`/applications?status=${queueFilter}`));
+      setCounts(getCounts(stats, scoredJobs));
+      if (tab === "jobs") {
+        setJobs(scoredJobs);
+      } else {
+        setApps(applications);
+      }
     } catch (e) {
       setLoadError(e.message);
     }
-  };
+  }, [tab]);
 
   const { msg, busy, run } = useAction(refresh);
   const search = query.trim().toLowerCase();
@@ -35,12 +86,50 @@ export default function Jobs({ query = "", initialTab = "queue" }) {
   );
 
   useEffect(() => {
-    refresh();
-  }, [tab, queueFilter]);
+    let active = true;
+    loadJobsData(tab)
+      .then(({ stats, scoredJobs, applications }) => {
+        if (!active) return;
+        setLoadError(null);
+        setCounts(getCounts(stats, scoredJobs));
+        if (tab === "jobs") setJobs(scoredJobs);
+        else setApps(applications);
+      })
+      .catch((error) => {
+        if (active) setLoadError(error.message);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [tab]);
+
+  const totalPipelineJobs =
+    counts.scored +
+    counts.pending_approval +
+    counts.approved +
+    counts.applied +
+    counts.rejected;
 
   return (
-    <>
-      <h1 className="page-title">Jobs and queue</h1>
+    <section className="jobs-page">
+      <header className="jobs-hero">
+        <div className="jobs-hero-copy">
+          <span className="jobs-hero-icon"><BriefcaseBusiness size={26} /></span>
+          <div>
+            <h1>Jobs and queue</h1>
+            <p>Manage your job approvals and track the automation pipeline.</p>
+          </div>
+        </div>
+        <div className="jobs-hero-art" aria-hidden="true">
+          <div className="jobs-found-badge">
+            <Sparkles size={16} />
+            <span>Jobs in pipeline<strong>{totalPipelineJobs}</strong></span>
+          </div>
+          <Rocket className="jobs-rocket" size={38} />
+        </div>
+      </header>
+
       {loadError && <div className="msg error">{loadError}</div>}
       {msg && (
         <div className={`msg ${msg.type === "error" ? "error" : ""}`}>
@@ -48,104 +137,107 @@ export default function Jobs({ query = "", initialTab = "queue" }) {
         </div>
       )}
 
-      <div className="tabs">
-        <button
-          className={tab === "queue" ? "active" : ""}
-          onClick={() => setTab("queue")}
-        >
-          Approval queue
-        </button>
-        <button
-          className={tab === "jobs" ? "active" : ""}
-          onClick={() => setTab("jobs")}
-        >
-          Scored jobs
-        </button>
-      </div>
+      <nav className="jobs-tabs" aria-label="Filter jobs">
+        {TABS.map(({ id, label }) => (
+          <button
+            key={id}
+            className={tab === id ? "active" : ""}
+            aria-pressed={tab === id}
+            onClick={() => setTab(id)}
+          >
+            {id === "queue" && <Rocket size={14} />}
+            {id === "approved" && <Check size={14} />}
+            {id === "applied" && <CheckCircle2 size={14} />}
+            {id === "rejected" && <X size={14} />}
+            {label}
+            {id !== "queue" && (
+              <span className="jobs-tab-count">
+                {counts[id === "jobs" ? "scored" : id]}
+              </span>
+            )}
+            {id === "queue" && (
+              <span className="jobs-tab-count">{counts.pending_approval}</span>
+            )}
+          </button>
+        ))}
+      </nav>
 
       {tab === "jobs" && (
         <>
           {visibleJobs.length === 0 && (
-            <p className="muted">
+            <p className="jobs-empty">
               {search
                 ? "No scored jobs match your search."
-                : "Abhi koi scored job nahi."}
+                : "No scored jobs yet. Run automation to discover and score jobs."}
             </p>
           )}
-          {visibleJobs.map((j) => (
-            <JobCard key={j._id} job={j} />
+          {visibleJobs.map((job) => (
+            <JobCard key={job._id} job={job} />
           ))}
         </>
       )}
 
-      {tab === "queue" && (
+      {tab !== "jobs" && (
         <>
-          <div className="tabs">
-            {QUEUE_FILTERS.map((s) => (
-              <button
-                key={s}
-                className={queueFilter === s ? "active" : ""}
-                onClick={() => setQueueFilter(s)}
-              >
-                {s.replace("_", " ")}
-              </button>
-            ))}
-          </div>
-
           {visibleApps.length === 0 && (
-            <p className="muted">
+            <p className="jobs-empty">
               {search
                 ? "No applications match your search."
-                : "Is status mein koi application nahi."}
+                : tab === "queue"
+                  ? "Your approval queue is empty. Score jobs and add matches to the queue."
+                  : `No ${tab.replace("_", " ")} applications yet.`}
             </p>
           )}
 
-          {visibleApps.map((a) => (
-            <JobCard key={a._id} job={a.job}>
-              {a.status === "pending_approval" && (
+          {visibleApps.map((application) => (
+            <JobCard key={application._id} job={application.job}>
+              {application.status === "pending_approval" && (
                 <>
                   <button
-                    className="good"
+                    className="job-action approve"
                     disabled={busy}
                     onClick={() =>
                       run("Approve", () =>
-                        patch(`/applications/${a._id}/approve`),
+                        patch(`/applications/${application._id}/approve`),
                       )
                     }
                   >
-                    Approve
+                    Approve <Check size={13} />
                   </button>
                   <button
-                    className="bad"
+                    className="job-action reject"
                     disabled={busy}
                     onClick={() =>
                       run("Reject", () =>
-                        patch(`/applications/${a._id}/reject`),
+                        patch(`/applications/${application._id}/reject`),
                       )
                     }
                   >
-                    Reject
+                    Reject <X size={13} />
                   </button>
                 </>
               )}
-              {a.status === "approved" && (
+              {application.status === "approved" && (
                 <button
-                  className="btn-primary"
+                  className="job-action approve"
                   disabled={busy}
                   onClick={() =>
                     run("Mark applied", () =>
-                      patch(`/applications/${a._id}/applied`),
+                      patch(`/applications/${application._id}/applied`),
                     )
                   }
                 >
-                  Maine apply kar diya
+                  Maine apply kar diya <ArrowRight size={13} />
                 </button>
               )}
-              <span className="pill">{a.status.replace("_", " ")}</span>
+              <span className={`job-status-pill ${application.status}`}>
+                {application.status.replace("_", " ") === "pending approval" && <Clock3 size={12} />}
+                {application.status.replace("_", " ")}
+              </span>
             </JobCard>
           ))}
         </>
       )}
-    </>
+    </section>
   );
 }
